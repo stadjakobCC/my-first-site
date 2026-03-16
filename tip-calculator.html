@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tip Calculator – Jakob's Startup Hub</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">Jakob's Startup Hub</a>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="calculator.html">Calculator</a></li>
+            <li><a href="tip-calculator.html" class="active">Tip Calculator</a></li>
+        </ul>
+    </nav>
+
+    <div class="tip-page">
+        <div class="tip-card">
+            <h1>Tip Calculator</h1>
+
+            <label for="bill">Bill Amount (€)</label>
+            <input type="number" id="bill" placeholder="0.00" min="0" step="0.01">
+
+            <label>Tip Percentage</label>
+            <div class="tip-buttons">
+                <button class="tip-btn" data-tip="10">10%</button>
+                <button class="tip-btn" data-tip="15">15%</button>
+                <button class="tip-btn" data-tip="20">20%</button>
+            </div>
+
+            <label for="people">Number of People</label>
+            <input type="number" id="people" placeholder="1" min="1" step="1">
+
+            <div class="tip-results">
+                <div class="tip-result-row">
+                    <span>Tip Amount</span>
+                    <span id="tip-amount">€0.00</span>
+                </div>
+                <div class="tip-result-row">
+                    <span>Total Amount</span>
+                    <span id="total-amount">€0.00</span>
+                </div>
+                <div class="tip-result-row tip-result-highlight">
+                    <span>Per Person</span>
+                    <span id="per-person">€0.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedTip = 0;
+
+        document.querySelectorAll('.tip-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tip-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedTip = parseInt(btn.dataset.tip);
+                calculate();
+            });
+        });
+
+        document.getElementById('bill').addEventListener('input', calculate);
+        document.getElementById('people').addEventListener('input', calculate);
+
+        function calculate() {
+            const bill = parseFloat(document.getElementById('bill').value) || 0;
+            const people = parseInt(document.getElementById('people').value) || 1;
+            const tip = bill * (selectedTip / 100);
+            const total = bill + tip;
+            const perPerson = total / people;
+
+            document.getElementById('tip-amount').textContent = '€' + tip.toFixed(2);
+            document.getElementById('total-amount').textContent = '€' + total.toFixed(2);
+            document.getElementById('per-person').textContent = '€' + perPerson.toFixed(2);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculator – Jakob's Startup Hub</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">Jakob's Startup Hub</a>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="calculator.html" class="active">Calculator</a></li>
+            <li><a href="tip-calculator.html">Tip Calculator</a></li>
+        </ul>
+    </nav>
+
+    <div class="calc-page">
+        <div class="calc">
+            <div class="calc-display">
+                <div class="calc-expression" id="expression"></div>
+                <div class="calc-result" id="result">0</div>
+            </div>
+            <div class="calc-buttons">
+                <button class="btn btn-wide btn-secondary" onclick="clearAll()">AC</button>
+                <button class="btn btn-secondary" onclick="toggleSign()">+/−</button>
+                <button class="btn btn-secondary" onclick="inputPercent()">%</button>
+                <button class="btn btn-operator" onclick="inputOperator('/')">÷</button>
+
+                <button class="btn" onclick="inputDigit('7')">7</button>
+                <button class="btn" onclick="inputDigit('8')">8</button>
+                <button class="btn" onclick="inputDigit('9')">9</button>
+                <button class="btn btn-operator" onclick="inputOperator('*')">×</button>
+
+                <button class="btn" onclick="inputDigit('4')">4</button>
+                <button class="btn" onclick="inputDigit('5')">5</button>
+                <button class="btn" onclick="inputDigit('6')">6</button>
+                <button class="btn btn-operator" onclick="inputOperator('-')">−</button>
+
+                <button class="btn" onclick="inputDigit('1')">1</button>
+                <button class="btn" onclick="inputDigit('2')">2</button>
+                <button class="btn" onclick="inputDigit('3')">3</button>
+                <button class="btn btn-operator" onclick="inputOperator('+')">+</button>
+
+                <button class="btn btn-wide" onclick="inputDigit('0')">0</button>
+                <button class="btn" onclick="inputDot()">.</button>
+                <button class="btn btn-accent" onclick="calculate()">=</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let current = '0';
+        let previous = '';
+        let operator = null;
+        let shouldResetScreen = false;
+
+        const resultEl = document.getElementById('result');
+        const expressionEl = document.getElementById('expression');
+
+        function updateDisplay() {
+            resultEl.textContent = current;
+        }
+
+        function inputDigit(digit) {
+            if (current === '0' || shouldResetScreen) {
+                current = digit;
+                shouldResetScreen = false;
+            } else {
+                if (current.length >= 12) return;
+                current += digit;
+            }
+            updateDisplay();
+        }
+
+        function inputDot() {
+            if (shouldResetScreen) { current = '0'; shouldResetScreen = false; }
+            if (!current.includes('.')) current += '.';
+            updateDisplay();
+        }
+
+        function inputOperator(op) {
+            if (operator && !shouldResetScreen) calculate(true);
+            previous = current;
+            operator = op;
+            shouldResetScreen = true;
+            const symbols = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+            expressionEl.textContent = previous + ' ' + symbols[op];
+        }
+
+        function calculate(chaining = false) {
+            if (!operator || shouldResetScreen) return;
+            const a = parseFloat(previous);
+            const b = parseFloat(current);
+            let res;
+            switch (operator) {
+                case '+': res = a + b; break;
+                case '-': res = a - b; break;
+                case '*': res = a * b; break;
+                case '/': res = b === 0 ? 'Error' : a / b; break;
+            }
+            if (!chaining) {
+                const symbols = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+                expressionEl.textContent = previous + ' ' + symbols[operator] + ' ' + current + ' =';
+                operator = null;
+            }
+            current = res === 'Error' ? 'Error' : String(parseFloat(res.toFixed(10)));
+            shouldResetScreen = true;
+            updateDisplay();
+        }
+
+        function clearAll() {
+            current = '0';
+            previous = '';
+            operator = null;
+            shouldResetScreen = false;
+            expressionEl.textContent = '';
+            updateDisplay();
+        }
+
+        function toggleSign() {
+            current = String(parseFloat(current) * -1);
+            updateDisplay();
+        }
+
+        function inputPercent() {
+            current = String(parseFloat(current) / 100);
+            updateDisplay();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9') inputDigit(e.key);
+            else if (e.key === '.') inputDot();
+            else if (e.key === '+') inputOperator('+');
+            else if (e.key === '-') inputOperator('-');
+            else if (e.key === '*') inputOperator('*');
+            else if (e.key === '/') { e.preventDefault(); inputOperator('/'); }
+            else if (e.key === 'Enter' || e.key === '=') calculate();
+            else if (e.key === 'Escape') clearAll();
+            else if (e.key === 'Backspace') {
+                if (current.length > 1) current = current.slice(0, -1);
+                else current = '0';
+                updateDisplay();
+            }
+        });
+    </script>
+</body>
+</html>
